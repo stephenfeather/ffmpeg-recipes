@@ -248,15 +248,23 @@ do
 
     ## transcode
     ffmpeg-bar -i "$line" `## input the discovered source file` \
-               $input_maps `## handles input mapping  for multichannel audio` \
-               -c:v "$video_encode_codec"  \
-               -b:v "$video_bitrate"k `## use the calculated video bit rate based on the source` \
-               -pix_fmt yuv420p `## force the pixel format to yuv420p for quicktime compatibility` \
-               $video_filters `## plugs in built out filters` \
-               -sn `## strip subtitles in favor of external files` \
-               $audio_processing  `## handles audio mapping when source material is 5.1` \
-               $metadata  `## adds metadata` \
-               "$NEW_FILE" < /dev/null ## output to new file name
+            	$input_maps `## handles input mapping  for multichannel audio` \
+            	-c:v "$video_encode_codec"  \
+            	-b:v "$video_bitrate"k `## use the calculated video bit rate based on the source` \
+            	-pix_fmt yuv420p `## force the pixel format to yuv420p for quicktime compatibility` \
+            	$video_filters `## plugs in built out filters` \
+            	-sn `## strip subtitles in favor of external files` \
+            	$audio_processing  `## handles audio mapping when source material is 5.1` \
+            	$metadata  `## adds metadata` \
+            	"$NEW_FILE" < /dev/null ## output to new file name
+
+	## Because trash is destructive, we should check for before destroying things
+    if [ $? -ne 0 ]; then
+    	echo "Error occurred in iteration $i, skipping to the next..."
+    	continue  # Skip the current iteration and move to the next
+    fi
+
+    #trash "$line"
     trash "$line"
 
     eval $(ffprobe -v quiet -show_format -of flat=s=_ -show_entries stream=height,width,nb_frames,nb_streams,duration,codec_name,bit_rate,channels,display_aspect_ratio,codec_type,size "$NEW_FILE");
