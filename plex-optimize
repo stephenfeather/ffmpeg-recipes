@@ -9,6 +9,23 @@ PATHS=() # BASH ARRAY OF PATHS TO RECURSIVELY CHECK FOR VIDEO FILES
 FILE_EXT=("avi" "mkv" "m4v" "flv" "mov" "wmv" "webm" "gif") # FILE EXTENSIONS TO SEARCH FOR
 ######### END CONFIGURATION #########
 
+######### HANDLE INPUT ARGUMENTS #########
+# If the user passes paths as arguments, populate PATHS from them
+if [ "$#" -gt 0 ]; then
+  PATHS=("$@")
+fi
+
+# If PATHS is still empty, prompt the user for a directory
+if [ "${#PATHS[@]}" -eq 0 ]; then
+  read -rp "Enter the starting directory for search: " input_path
+  if [ -d "$input_path" ]; then
+    PATHS+=("$input_path")
+  else
+    echo "Invalid directory. Exiting..."
+    exit 1
+  fi
+fi
+
 ######### GENERATE THE FILE LIST #########
 FIND_FILE_EXT=() # FILE EXTENSIONS WILL BE UPATED WITH FIND SYNTAX AND STORED IN A SEPARATE ARRAY
 
