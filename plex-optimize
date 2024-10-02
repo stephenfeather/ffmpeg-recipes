@@ -59,7 +59,14 @@ for i in "${PATHS[@]}"
 do
   ## SEARCHES ALL PATHS FOR EACH OF THE EXTENSIONS AND
   ## STORES THE FULL PATH FOR EACH ONE FOUND, ONE PER LINE
-  find "$i" \( $FIND_FILE_EXT \) -exec greadlink -f {} >> "$FILELIST" \;
+  # Construct the find command string for echoing
+  FIND_CMD="find \"$i\" \\( $FIND_FILE_EXT \\) -exec greadlink -f {} >> \"$FILELIST\" \\;"
+
+  # Echo the find command before running it
+  # echo "Generated find command: $FIND_CMD"
+
+  # Execute the find command
+  eval "$FIND_CMD"
 done
 
 FILE_COUNT=$(wc -l "$FILELIST" | awk '{print $1}')
